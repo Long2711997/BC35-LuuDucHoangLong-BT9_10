@@ -3,12 +3,11 @@ var validation = new Validation();
 
 getLocalStorage();
 
-
 function getEle(id) {
     return document.getElementById(id);
 }
 
-function layThongTinNV(){
+function layThongTinNV(isAdd){
     var taiKhoan = getEle('tknv').value;
     var tenNV = getEle('name').value;
     var email = getEle('email').value;
@@ -21,32 +20,30 @@ function layThongTinNV(){
     // //flag
     var isValid = true;
 
+    if (isAdd){
+        isValid &= validation.kiemTraRong(taiKhoan, 'tbTKNV', '*Vui lòng nhập tài khoản') && 
+        validation.kiemTraTaiKhoan(taiKhoan, 'tbTKNV', '*Tài khoản phải từ 4 đến 6 ký tự') &&
+        validation.kiemTraTaiKhoanTrung(taiKhoan, 'tbTKNV', '*Tài khoản đã tồn tại', dsnv.arr);
+
+        isValid &= validation.kiemTraRong(matKhau, 'tbMatKhau', '*Vui lòng nhập mật khẩu') && validation.kiemtraMatKhau(matKhau, 'tbMatKhau', '*Mật khẩu phải có 6-10 ký tự, chứa ít nhất 1 ký tự số, 1 ký tự in hoa, 1 ký tự đặc biệt') 
+    }
     //VALIDATE
-    isValid &= validation.kiemTraRong(taiKhoan, 'tbTKNV', '*Vui lòng nhập tài khoản')
-    isValid &= validation.kiemTraTaiKhoan(taiKhoan, 'tbTKNV', '*Tài khoản phải từ 4 đến 6 ký tự')
+    
 
-    isValid &= validation.kiemTraRong(tenNV, 'tbTen', '*Vui lòng nhập tên nhân viên')
-    isValid &= validation.kiemTraTen(tenNV, 'tbTen', '*Tên nhân viên phải là chữ')
+    isValid &= validation.kiemTraRong(tenNV, 'tbTen', '*Vui lòng nhập tên nhân viên') && validation.kiemTraTen(tenNV, 'tbTen', '*Tên nhân viên phải là chữ')
 
-    isValid &= validation.kiemTraRong(email, 'tbEmail', '*Vui lòng nhập Email nhân viên')
-    isValid &= validation.kiemTraMail(email, 'tbEmail', '*Vui lòng nhập đúng định dạng Email')    
-
-    isValid &= validation.kiemTraRong(matKhau, 'tbMatKhau', '*Vui lòng nhập mật khẩu')
-    isValid &= validation.kiemtraMatKhau(matKhau, 'tbMatKhau', '*Mật khẩu phải có 6-10 ký tự, chứa ít nhất 1 ký tự số, 1 ký tự in hoa, 1 ký tự đặc biệt')  
+    isValid &= validation.kiemTraRong(email, 'tbEmail', '*Vui lòng nhập Email nhân viên') && validation.kiemTraMail(email, 'tbEmail', '*Vui lòng nhập đúng định dạng Email')     
 
     isValid &= validation.kiemTraRong(ngayLam, 'tbNgay', '*Vui lòng nhập ngày làm')
 
-    isValid &= validation.kiemTraRong(luong, 'tbLuongCB', '*Vui lòng nhập lương cơ bản')
-    isValid &= validation.kiemTraLuong(luong, 'tbLuongCB', '*Vui lòng nhập đúng lương') 
+    isValid &= validation.kiemTraRong(luong, 'tbLuongCB', '*Vui lòng nhập lương cơ bản') && validation.kiemTraLuong(luong, 'tbLuongCB', '*Vui lòng nhập đúng lương') 
 
-    isValid &= validation.kiemTraChucVu(chucVu, 'tbChucVu', '*Vui lòng chọn chức vụ')
+    isValid &= validation.kiemTraChucVu('chucvu', 'tbChucVu', '*Vui lòng chọn chức vụ')
 
-    isValid &= validation.kiemTraRong(gioLam, 'tbGiolam', '*Vui lòng nhập giờ làm')
-    isValid &= validation.kiemTraGioLam(gioLam, 'tbGiolam', '*Vui lòng nhập đúng giờ làm')
+    isValid &= validation.kiemTraRong(gioLam, 'tbGiolam', '*Vui lòng nhập giờ làm') && validation.kiemTraGioLam(gioLam, 'tbGiolam', '*Vui lòng nhập đúng giờ làm')
 
 
     if (isValid){
-        //tạo đối tượng sinhVien tuừ lớp đối tượng NhanVien
     var nv = new NhanVien(taiKhoan, tenNV, email, matKhau, ngayLam, luong, chucVu, gioLam );
 
     nv.tinhLuong();
@@ -57,21 +54,32 @@ function layThongTinNV(){
     return null
 }
 
- //Them nhan vien
 getEle('btnThemNV').addEventListener('click', function(){
     var nv = layThongTinNV();
 
     if (nv){
-        //Them nhan vien
     dsnv.themNV(nv);
 
-    //Rednder table
     renderTable(dsnv.arr)
 
-    //Lưu data
     setLocalStorage();
     }   
 });
+
+getEle('btnDong').addEventListener('click', function(){
+    getEle('tknv').value = '';
+    getEle('tknv').disabled = false;
+    getEle('name').value = '';
+    getEle('email').value = '';
+    getEle('password').value = '';
+    getEle('password').disabled = false;
+    getEle('datepicker').value = '';
+    getEle('luongCB').value = '';
+    getEle('chucvu').value = '';
+    getEle('gioLam').value = '';
+
+    getEle('btnThemNV').style.display = "inline-block";
+})
 
 
 function renderTable(data){
@@ -99,7 +107,6 @@ function renderTable(data){
     getEle('tableDanhSach').innerHTML = content;
 }
 
-//Xóa nhân viên
 function deleteNV(taiKhoan){
     dsnv.xoaNV(taiKhoan)
     renderTable(dsnv.arr)
@@ -121,21 +128,17 @@ function editNV(taiKhoan){
         getEle('chucvu').value = nv.chucVu;
         getEle('gioLam').value = nv.gioLam;
     }
-    //Display btnUpdate
     getEle('btnCapNhat').style.display = "inline-block";
-    //Hide btn
     getEle('btnThemNV').style.display = "none";
 }
 
-//Cap  nhat NV
 getEle('btnCapNhat').addEventListener("click", function(){
-    var nv = layThongTinNV();
+    var nv = layThongTinNV(false);
     dsnv.capNhatNhanVien(nv);
     renderTable(dsnv.arr);
     setLocalStorage()
 })
 
-//Tim kiem NV
 getEle('searchName').addEventListener("keyup", function(){
     var keyword = getEle('searchName').value;
     var mangTimKiem = dsnv.timKiemNhanVien(keyword);
@@ -143,15 +146,12 @@ getEle('searchName').addEventListener("keyup", function(){
 })
 
 function setLocalStorage(){
-    //Chuyển ar từ JSON sang string
     var dataString = JSON.stringify(dsnv.arr)
-    //Lưu data xuống LocalStorage của trình duyệt
     localStorage.setItem("DSNV", dataString)
 }
 
 function getLocalStorage(){
     var dataString = localStorage.getItem("DSNV")
-    //Convert String -> JSON
     dsnv.arr = JSON.parse(dataString)
     renderTable(dsnv.arr)
 }

@@ -75,16 +75,17 @@ function Validation(){
             return true;
     }
 
-    this.kiemTraChucVu = function(value, divError, mess){
-        if (value === "Chọn chức vụ"){
-            getEle(divError).innerHTML = mess;
-            getEle(divError).style.display = "block";
-            return false;
-        }
-            getEle(divError).innerHTML = '';
-            getEle(divError).style.display = "none";
-            return true;
+    this.kiemTraChucVu = function (idSelect, divError, mess) {
+    if (getEle(idSelect).selectedIndex !== 0) {
+      getEle(divError).innerHTML = "";
+      getEle(divError).style.display = "none";
+      return true;
     }
+
+    getEle(divError).innerHTML = mess;
+    getEle(divError).style.display = "block";
+    return false;
+  };
 
     this.kiemTraGioLam = function(value, divError, mess){
         if (value < 80 || value > 200){
@@ -96,4 +97,26 @@ function Validation(){
             getEle(divError).style.display = "none";
             return true;
     }
+
+    this.kiemTraTaiKhoanTrung = function (value, divError, mess, arr) {
+    var isExist = false;
+
+    for (var i = 0; i < arr.length; i++) {
+      var nv = arr[i];
+      if (nv.taiKhoan === value) {
+        isExist = true;
+        break;
+      }
+    }
+
+    if (isExist) {
+      getEle(divError).innerHTML = mess;
+      getEle(divError).style.display = "block";
+      return false;
+    }
+
+    getEle(divError).innerHTML = "";
+    getEle(divError).style.display = "none";
+    return true;
+  };
 }
